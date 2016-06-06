@@ -5,8 +5,10 @@ package com.theironyard;
  */
 public class User {
     String name;
+    String pass;
 
-    public User(String name) {
+    public User(String name, String pass) {
         this.name = name;
+        this.pass = pass;
     }
 }
