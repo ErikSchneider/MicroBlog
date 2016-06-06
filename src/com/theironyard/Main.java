@@ -1,6 +1,5 @@
 package com.theironyard;
 
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 import spark.ModelAndView;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
@@ -12,7 +11,7 @@ public class Main {
 
     static User user;
     static ArrayList<User> userList = new ArrayList<>();
-    static ArrayList<String> messages = new ArrayList<>();
+    static ArrayList<Message> messages = new ArrayList<>();
 
     public static void main(String[] args) {
         Spark.init();
@@ -24,9 +23,8 @@ public class Main {
                         return new ModelAndView(map, "index.html");
                     }
                     else {
-
                         map.put("name", user.name);
-                        map.put("message", messages);
+                        map.put("messages", messages);
                         return new ModelAndView(map, "messages.html");
                     }
                 },
@@ -46,8 +44,7 @@ public class Main {
                 "/create-message",
                 (request, response) -> {
                     String message = request.queryParams("message");
-                    user = new User(message);
-                    messages.add(message);
+                    messages.add(new Message(message));
                     response.redirect("/");
                     return "";
                 }
