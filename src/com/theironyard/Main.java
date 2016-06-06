@@ -38,8 +38,14 @@ public class Main {
                     String pass = request.queryParams("password");
                     user = userList.get(username);
                     if (user == null) {
-                        user =  new User(username,pass);
-                        userList.put(username, user);
+                        if (!username.equals("") && !pass.equals("")) {
+
+                            user = new User(username, pass);
+                            userList.put(username, user);
+                        }
+                        else {
+                            response.redirect("/");
+                        }
                     }
                     if (!pass.equals(user.pass)) {
                        user = null;
