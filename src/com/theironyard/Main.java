@@ -14,6 +14,7 @@ public class Main {
     static ArrayList<Message> messages = new ArrayList<>();
 
     public static void main(String[] args) {
+        Spark.externalStaticFileLocation("Public");
         Spark.init();
         Spark.get(
                 "/",
