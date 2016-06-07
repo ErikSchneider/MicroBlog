@@ -1,33 +1,33 @@
 package com.theironyard;
 
 import spark.ModelAndView;
+import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
 
-    static User user;
-    static HashMap<String, User> userList = new HashMap<>();
-    static ArrayList<Message> messages = new ArrayList<>();
+    static HashMap<String, User> userMap = new HashMap<>();
 
     public static void main(String[] args) {
-        Spark.externalStaticFileLocation("Public");
         Spark.init();
         Spark.get(
                 "/",
                 (request, response) -> {
-                    HashMap map = new HashMap();
-                    if (user == null) {
-                        return new ModelAndView(map, "index.html");
+                    Session session = request.session();
+                    String username = session.attribute("username");
+
+                    HashMap m = new HashMap();
+                    if (username == null){
+                        return new ModelAndView(m, "index.html");
                     }
                     else {
-                        map.put("name", user.name);
-                        map.put("messages", messages);
-                        map.put("password", user.pass);
-                        return new ModelAndView(map, "messages.html");
+                        User user = userMap.get(username);
+                        m.put("name", username);
+                        m.put("messages", user.messages);
+                        return new ModelAndView(m, "messages.html");
                     }
                 },
                 new MustacheTemplateEngine()
@@ -35,22 +35,23 @@ public class Main {
         Spark.post(
                 "/create-user",
                 (request, response) -> {
-                    String username = request.queryParams("username");
+                    String name = request.queryParams("username");
                     String pass = request.queryParams("password");
-                    user = userList.get(username);
-                    if (user == null) {
-                        if (!username.equals("") && !pass.equals("")) {
+                    if (name == null || pass == null) {
+                        throw new Exception("Name or pass not sent");
+                    }
 
-                            user = new User(username, pass);
-                            userList.put(username, user);
-                        }
-                        else {
-                            response.redirect("/");
-                        }
+                    User user = userMap.get(name);
+                    if (user == null) {
+                        user = new User(name, pass);
+                        userMap.put(name, user);
                     }
-                    if (!pass.equals(user.pass)) {
-                       user = null;
+                    else if (!name.equals(user.name)) {
+                        throw new Exception("Wrong password");
                     }
+
+                    Session session = request.session();
+                    session.attribute("username", name);
 
                     response.redirect("/");
                     return "";
@@ -59,17 +60,89 @@ public class Main {
         Spark.post(
                 "/create-message",
                 (request, response) -> {
+                    Session session = request.session();
+                    String username = session.attribute("username");
+
                     String message = request.queryParams("message");
-                    messages.add(new Message(message));
+                    if (message.isEmpty()) {
+                        throw new Exception("Invalid form field");
+                    }
+
+                    User user= userMap.get(username);
+                    if (user == null) {
+                        throw new Exception("User does not exist");
+                    }
+
+                    Message m1 = new Message(message);
+                    user.messages.add(m1);
+
                     response.redirect("/");
                     return "";
+                }
+        );
+        Spark.post(
+                "/edit-message",
+                (request, response) -> {
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    if (username == null) {
+                        throw new Exception("Not logged in");
+                    }
+                    int id = Integer.valueOf(request.queryParams("id"));
 
+                    User user = userMap.get(username);
+                    if (id <= 0 || id -1 >= user.messages.size()) {
+                        throw new Exception("Invalid id");
+                    }
+
+                    user.messages.get(id -1);
+                    Message m1 = new Message(request.queryParams("message2"));
+                    //user.messages.remove(id - 1);
+
+                    String message = request.queryParams("message2");
+                    if (message.isEmpty()) {
+                        throw new Exception("Invalid form field");
+                    }
+                    m1.message = message;
+                    user.messages.set(id -1, m1);
+                    //Message m2 = new Message(message);
+                    //user.messages.add(m2);
+                    // get message from user's message list
+                    // m.message = message;
+
+
+
+
+
+                    response.redirect("/");
+                    return "";
+                }
+        );
+        Spark.post(
+               "/delete-message",
+                (request, response) -> {
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    if (username == null) {
+                        throw new Exception("Not logged in");
+                    }
+                    int id = Integer.valueOf(request.queryParams("id"));
+
+                    User user = userMap.get(username);
+                    if (id <= 0 || id -1 >= user.messages.size()) {
+                        throw new Exception("Invalid id");
+                    }
+                    user.messages.remove(id - 1);
+
+                    response.redirect("/");
+                    return "";
                 }
         );
         Spark.post(
                 "/logout",
                 (request, response) -> {
-                    user = null;
+                    Session session = request.session();
+                    session.invalidate();
                     response.redirect("/");
                     return "";
                 }

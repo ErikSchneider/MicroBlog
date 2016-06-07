@@ -1,14 +1,19 @@
 package com.theironyard;
 
+import java.util.ArrayList;
+
 /**
  * Created by Erik on 6/6/16.
  */
 public class User {
     String name;
-    String pass;
+    String password;
 
-    public User(String name, String pass) {
+    ArrayList<Message> messages = new ArrayList<>();
+
+
+    public User(String name, String password) {
         this.name = name;
-        this.pass = pass;
+        this.password = password;
     }
 }

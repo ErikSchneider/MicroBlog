@@ -12,6 +12,11 @@
 </form>
 
 <br>
+<form action="/edit-message" method="post">
+    <input type="number" name="id" placeholder="#"/>
+    <input type="text" name="message2" placeholder="Edit Message..."/>
+    <button type="submit">Edit</button>
+</form>
 <br>
 {{name}}'s messages:
 
@@ -21,6 +26,15 @@
     <li>{{message}}</li>
     {{/messages}}
     </ol>
+
+<br>
+
+<form action="/delete-message" method="post">
+    <input type="number" name="id" placeholder="#"/>
+    <button type="submit">Delete Message</button>
+</form>
+
+<br>
 
 <form action="/logout" method="post">
     <button type="submit">Logout</button>
