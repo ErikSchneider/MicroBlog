@@ -103,16 +103,14 @@ public class Main {
                     if (message.isEmpty()) {
                         throw new Exception("Invalid form field");
                     }
+
                     m1.message = message;
                     user.messages.set(id -1, m1);
+
                     //Message m2 = new Message(message);
                     //user.messages.add(m2);
                     // get message from user's message list
                     // m.message = message;
-
-
-
-
 
                     response.redirect("/");
                     return "";
