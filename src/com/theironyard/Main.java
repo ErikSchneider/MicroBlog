@@ -19,12 +19,14 @@ public class Main {
                     Session session = request.session();
                     String username = session.attribute("username");
 
+                    User user = userMap.get(username);
+
+
                     HashMap m = new HashMap();
                     if (username == null){
                         return new ModelAndView(m, "index.html");
                     }
                     else {
-                        User user = userMap.get(username);
                         m.put("name", username);
                         m.put("messages", user.messages);
                         return new ModelAndView(m, "messages.html");
@@ -46,7 +48,7 @@ public class Main {
                         user = new User(name, pass);
                         userMap.put(name, user);
                     }
-                    else if (!name.equals(user.name)) {
+                    else if (!user.password.equals(pass)) {
                         throw new Exception("Wrong password");
                     }
 
