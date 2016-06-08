@@ -26,7 +26,13 @@ public class Main {
                     if (username == null){
                         return new ModelAndView(m, "index.html");
                     }
-                    else {
+                    else { // Not the ideal way to do this.
+                        int id = 1;
+                        for (Message msg : user.messages) {
+                            msg.id = id;
+                            id++;
+                        }
+
                         m.put("name", username);
                         m.put("messages", user.messages);
                         return new ModelAndView(m, "messages.html");
